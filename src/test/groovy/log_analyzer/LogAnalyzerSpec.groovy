@@ -1,33 +1,38 @@
 package log_analyzer
 
-import spock.lang.Shared
 import spock.lang.Specification
+
 import java.nio.file.Paths
 
-class LogAnalyzerMergerSpec extends Specification {
+class LogAnalyzerSpec extends Specification {
 
-    def "Should validate a file is ordered and condensed"() {
-        setup: "Creating a file"
+    def "Should validate files are ordered"() {
+        setup: "Creating server files"
+        File tmpDir = File.createTempDir()
         File tmpTargetDir = File.createTempDir()
-        File tmpFile1 = new File(Paths.get(tmpTargetDir.path, "2020_03_19").toString())
-        tmpFile1.createNewFile()
-        tmpFile1.append("2020-03-19T21:14:14.389, Server4, This is an awesome log 125\n")
-        tmpFile1.append("2020-03-19T20:14:14.389, Server3, This is an awesome log 125\n")
 
 
-        File tmpFile2 = new File(Paths.get(tmpTargetDir.path, "2020_03_20").toString())
+        File tmpFile = new File(Paths.get(tmpDir.path, "server.log").toString())
+        tmpFile.createNewFile()
+        tmpFile.append("2020-03-19T21:14:14.389, Server4, This is an awesome log 125\n")
+        tmpFile.append("2020-03-19T20:14:14.389, Server3, This is an awesome log 125\n")
+
+
+        File tmpFile2 = new File(Paths.get(tmpDir.path, "server2.log").toString())
         tmpFile2.createNewFile()
         tmpFile2.append("2020-03-20T21:14:14.389, Server4, This is an awesome log 125\n")
         tmpFile2.append("2020-03-20T20:14:14.389, Server3, This is an awesome log 125\n")
 
-        System.setProperty('TARGET_LOGS_PATH', tmpTargetDir.path)
+        System.setProperty('ORIGIN_PATH', tmpDir.path)
         System.setProperty('SPLIT_STRATEGY', 'DAYS')
+        System.setProperty('TARGET_LOGS_PATH', tmpTargetDir.path)
 
-        when: "Files are merged"
+        when: "Algorithm is used"
+        LogAnalyzer.validateTargetFolder()
+        LogAnalyzer.splitLogFiles()
         LogAnalyzer.mergeFiles()
 
         then: "Condensed log is ordered"
-
         List<String> condensedContent = tmpTargetDir
                 .listFiles()
                 .findAll { it.isFile() && it.name =~ LogAnalyzer.TARGET_LOG_NAME }.first().readLines()
@@ -41,6 +46,7 @@ class LogAnalyzerMergerSpec extends Specification {
 
 
         cleanup: "Remove tmp dirs"
+        tmpDir.deleteOnExit()
         tmpTargetDir.deleteOnExit()
         System.clearProperty('TARGET_LOGS_PATH')
         System.clearProperty('SPLIT_STRATEGY')

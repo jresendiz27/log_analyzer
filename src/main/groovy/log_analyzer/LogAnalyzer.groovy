@@ -33,7 +33,7 @@ class LogAnalyzer {
     static void mergeFiles() {
         File finalLog = new File(Paths.get(TARGET_LOGS_PATH, TARGET_LOG_NAME).toString())
         if (!finalLog.exists()) {
-            println("Creada ${finalLog.createNewFile()}")
+            finalLog.createNewFile()
         }
 
         PriorityQueue<LogEntry> queue = new PriorityQueue(new LogEntryComparator())
@@ -42,7 +42,6 @@ class LogAnalyzer {
                 .listFiles()
                 .findAll { it.isFile() && it.name != TARGET_LOG_NAME }
                 .sort { new SimpleDateFormat(FORMATS[SPLIT_STRATEGY]).parse(it.name) }
-        println logFiles*.name
         logFiles.each { File file ->
             file.eachLine { String line ->
                 queue.add(LogEntry.fromRow(line))
