@@ -32,7 +32,6 @@ class LogAnalyzer {
 
     static void mergeFiles() {
         File finalLog = new File(Paths.get(TARGET_LOGS_PATH, TARGET_LOG_NAME).toString())
-        println TARGET_LOGS_PATH
         if (!finalLog.exists()) {
             println("Creada ${finalLog.createNewFile()}")
         }
@@ -45,7 +44,6 @@ class LogAnalyzer {
                 .sort { new SimpleDateFormat(FORMATS[SPLIT_STRATEGY]).parse(it.name) }
         println logFiles*.name
         logFiles.each { File file ->
-            println"FILE >>> ${file.text}"
             file.eachLine { String line ->
                 queue.add(LogEntry.fromRow(line))
             }
@@ -53,7 +51,6 @@ class LogAnalyzer {
                 finalLog.append("${queue.poll().content}\n")
             }
         }
-        println(finalLog.text)
     }
 
     static List<File> splitLogFiles() {
