@@ -9,7 +9,6 @@
 plugins {
     // Apply the groovy plugin to add support for Groovy
     id 'groovy'
-    id 'application'
     id 'idea'
 }
 repositories {

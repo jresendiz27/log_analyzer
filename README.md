@@ -9,7 +9,3 @@ and sort them into a final log (date based)
 
 * Java 8+
 * Gradle wrapper installed
-
-### Usage 
-
-TBD
